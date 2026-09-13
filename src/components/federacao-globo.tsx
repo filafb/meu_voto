@@ -5,7 +5,7 @@ import type { Candidato } from "@/lib/candidatos";
 import { CandidatoOrb, ORB_LARGURA, ORB_ALTURA } from "./candidato-orb";
 
 const RAIO = 210;
-const SENSIBILIDADE = 0.6; // graus por pixel arrastado
+const SENSIBILIDADE = 0.4; // graus por pixel arrastado
 
 function distribuirNaEsfera(n: number, raio: number) {
   const pontos: { x: number; y: number; z: number }[] = [];
@@ -26,6 +26,7 @@ function distribuirNaEsfera(n: number, raio: number) {
 
 export function FederacaoGlobo({ membros }: { membros: Candidato[] }) {
   const pontos = useMemo(() => distribuirNaEsfera(membros.length, RAIO), [membros.length]);
+  const grupoRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
   const anguloRef = useRef(0);
   const arrastandoRef = useRef(false);
@@ -33,16 +34,24 @@ export function FederacaoGlobo({ membros }: { membros: Candidato[] }) {
 
   useEffect(() => {
     function renderizar() {
-      const rad = (anguloRef.current * Math.PI) / 180;
+      const angulo = anguloRef.current;
+      const rad = (angulo * Math.PI) / 180;
       const sin = Math.sin(rad);
       const cos = Math.cos(rad);
+
+      if (grupoRef.current) {
+        grupoRef.current.style.transform = `rotateY(${angulo}deg)`;
+      }
 
       pontos.forEach((p, i) => {
         const el = cardRefs.current[i];
         if (!el) return;
+        // Posição já rotacionada em torno do eixo Y (o grupo pai gira, o card
+        // é traduzido dentro desse espaço já rotacionado) — aqui só
+        // calculamos a profundidade aparente para dar a sensação de esfera.
         const zRotacionado = p.x * sin + p.z * cos;
         const profundidade = (zRotacionado + RAIO) / (2 * RAIO); // 0 (fundo) .. 1 (frente)
-        el.style.transform = `translate3d(${p.x}px, ${p.y}px, ${p.z}px) rotateY(${-anguloRef.current}deg) translate(-50%, -50%)`;
+        el.style.transform = `translate3d(${p.x}px, ${p.y}px, ${p.z}px) rotateY(${-angulo}deg) translate(-50%, -50%)`;
         el.style.opacity = String(0.3 + profundidade * 0.7);
         el.style.zIndex = String(Math.round(zRotacionado + RAIO));
       });
@@ -82,6 +91,7 @@ export function FederacaoGlobo({ membros }: { membros: Candidato[] }) {
       }}
     >
       <div
+        ref={grupoRef}
         className="absolute left-1/2 top-1/2"
         style={{ transformStyle: "preserve-3d", width: ORB_LARGURA, height: ORB_ALTURA }}
       >
