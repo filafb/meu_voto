@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { Redis } from "@upstash/redis";
 
 // Ordena a lista de candidatos exibida por relevância: primeiro por quantas
@@ -7,6 +8,15 @@ import { Redis } from "@upstash/redis";
 // Redis configurado (fica sendo o único critério nesse caso); a busca por
 // popularidade vira no-op sem as variáveis de ambiente — funciona
 // normalmente em desenvolvimento local sem Redis.
+//
+// O placar completo por UF é lido do Redis no máximo uma vez a cada
+// REVALIDATE_SEGUNDOS (via unstable_cache), em vez de uma leitura por busca
+// digitada — sem isso, cada tecla do autocomplete gastaria um comando do
+// plano gratuito do Upstash. Só a escrita (seleção de candidata/o) é
+// imediata; a ordenação por popularidade pode ficar até esse tempo
+// desatualizada, o que é aceitável para esse caso de uso.
+
+const REVALIDATE_SEGUNDOS = 300;
 
 const redis =
   process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
@@ -29,28 +39,38 @@ export async function registrarSelecao(uf: string, sq: string): Promise<void> {
   }
 }
 
-/** Reordena `itens`: mais buscadas/os no app primeiro; em empate (inclusive
- * quando não há Redis configurado), mais votadas/os em 2022 primeiro. */
+async function buscarPlacarCompleto(uf: string): Promise<Record<string, number>> {
+  if (!redis) return {};
+  try {
+    const bruto = await redis.zrange<(string | number)[]>(chave(uf), 0, -1, {
+      withScores: true,
+    });
+    const placar: Record<string, number> = {};
+    for (let i = 0; i < bruto.length; i += 2) {
+      placar[String(bruto[i])] = Number(bruto[i + 1]);
+    }
+    return placar;
+  } catch {
+    return {};
+  }
+}
+
+const getPlacarCacheado = unstable_cache(buscarPlacarCompleto, ["popularidade-placar"], {
+  revalidate: REVALIDATE_SEGUNDOS,
+});
+
+/** Reordena `itens`: mais buscadas/os no app primeiro (placar em cache por
+ * até alguns minutos); em empate (inclusive sem Redis configurado), mais
+ * votadas/os em 2022 primeiro. */
 export async function ordenarPorRelevancia<
   T extends { sq: string; votos2022: number | null },
 >(uf: string, itens: T[]): Promise<T[]> {
   if (itens.length === 0) return itens;
 
-  let popularidade: number[] = itens.map(() => 0);
-  if (redis) {
-    try {
-      const scores = await redis.zmscore(
-        chave(uf),
-        itens.map((i) => i.sq)
-      );
-      popularidade = itens.map((_, i) => scores?.[i] ?? 0);
-    } catch {
-      // segue com popularidade zerada para todas/os em caso de falha
-    }
-  }
+  const placar = redis ? await getPlacarCacheado(uf) : {};
 
   return itens
-    .map((item, i) => ({ item, pop: popularidade[i] }))
+    .map((item) => ({ item, pop: placar[item.sq] ?? 0 }))
     .sort((a, b) => b.pop - a.pop || (b.item.votos2022 ?? 0) - (a.item.votos2022 ?? 0))
     .map((x) => x.item);
 }

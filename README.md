@@ -122,6 +122,12 @@ Para ativar na Vercel:
    contador dela via `POST /api/candidatos`; as buscas seguintes já saem
    ordenadas por popularidade.
 
+O placar completo de cada UF é lido do Redis (`ZRANGE`) no máximo uma vez a
+cada 5 minutos, via `unstable_cache` — não a cada busca digitada — para não
+estourar o limite de comandos/mês do plano gratuito do Upstash mesmo com
+bastante tráfego. Só o incremento na seleção (`ZINCRBY`) é imediato; a
+ordenação por popularidade pode ficar até 5 minutos desatualizada.
+
 Para rodar localmente com a mesma ordenação, copie essas duas variáveis para
 um `.env.local`.
 
