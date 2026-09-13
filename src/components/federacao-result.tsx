@@ -68,10 +68,12 @@ export function FederacaoResult({
       </header>
 
       <div className="p-6">
-        <div className="mb-4">
-          <CandidatoCard candidato={candidato} destaque />
-        </div>
+        <CandidatoCard candidato={candidato} destaque />
+      </div>
 
+      <AtuaisDeputados atuais={atuais} ehFederacao={ehFederacao} />
+
+      <div className="p-6">
         <div className="mb-4 flex items-center justify-between gap-4">
           <h3 className="font-heading text-sm uppercase tracking-widest text-ink-muted">
             {ehFederacao ? "Demais candidatas/os da federação" : "Demais candidatas/os do partido"}{" "}
@@ -96,8 +98,6 @@ export function FederacaoResult({
           </div>
         )}
       </div>
-
-      <AtuaisDeputados atuais={atuais} />
     </section>
   );
 }
