@@ -1,5 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { Redis } from "@upstash/redis";
+import { Ratelimit } from "@upstash/ratelimit";
 
 // Ordena a lista de candidatos exibida por relevância: primeiro por quantas
 // vezes foi escolhida no autocomplete do app (sorted set por UF no Upstash
@@ -27,16 +28,35 @@ const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_
 
 const redis = REDIS_URL && REDIS_TOKEN ? new Redis({ url: REDIS_URL, token: REDIS_TOKEN }) : null;
 
+// Limita a 20 seleções por minuto por IP — o bastante pra uso normal (uma
+// pessoa buscando e trocando de candidata/o algumas vezes), pouco o
+// suficiente pra tornar inviável inflar o placar de alguém via script.
+// Sem Redis configurado, não há como limitar (nem há placar pra inflar).
+const limitador = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(20, "60 s"),
+      prefix: "ratelimit:selecao",
+    })
+  : null;
+
 function chave(uf: string) {
   return `popularidade:${uf.toUpperCase()}`;
 }
 
-export async function registrarSelecao(uf: string, sq: string): Promise<void> {
-  if (!redis) return;
+/** `true` se a seleção foi aceita; `false` se o IP estourou o limite. */
+export async function registrarSelecao(uf: string, sq: string, ip: string): Promise<boolean> {
+  if (!redis) return true;
   try {
+    if (limitador) {
+      const { success } = await limitador.limit(ip);
+      if (!success) return false;
+    }
     await redis.zincrby(chave(uf), 1, sq);
+    return true;
   } catch {
     // Falha ao registrar não deve quebrar a experiência do usuário.
+    return true;
   }
 }
 

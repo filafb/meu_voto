@@ -134,6 +134,14 @@ ordenação por popularidade pode ficar até 5 minutos desatualizada.
 Para rodar localmente com a mesma ordenação, copie essas duas variáveis para
 um `.env.local`.
 
+**Proteção contra abuso**: `POST /api/candidatos` (o endpoint que registra
+uma seleção) valida que o `sq` enviado é uma candidatura real antes de
+gravar no Redis, e limita a 20 seleções por minuto por IP
+(`@upstash/ratelimit`) — o suficiente pra uso normal, pouco o bastante pra
+inviabilizar inflar o placar de alguém ou estourar a cota do Upstash via
+script. Sem Redis configurado, essa rota não tem o que limitar (nem placar
+pra inflar).
+
 ## Deploy
 
 Projeto pronto para deploy na [Vercel](https://vercel.com/new) — é uma
