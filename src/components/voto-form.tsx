@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { Candidato } from "@/lib/candidatos";
+import type { Candidato, DeputadoAtual } from "@/lib/candidatos";
 import { UF_NOMES } from "@/lib/uf-nomes";
 import { CandidatoPicker } from "./candidato-picker";
 import { FederacaoResult, type Grupo } from "./federacao-result";
@@ -10,6 +10,7 @@ type Resultado = {
   candidato: Candidato;
   grupo: Grupo;
   membros: Candidato[];
+  atuais: DeputadoAtual[];
 };
 
 const UF_STORAGE_KEY = "meu-voto:uf";
@@ -110,6 +111,7 @@ export function VotoForm({ ufs }: { ufs: string[] }) {
           candidato={resultado.candidato}
           grupo={resultado.grupo}
           membros={resultado.membros}
+          atuais={resultado.atuais}
         />
       )}
     </div>

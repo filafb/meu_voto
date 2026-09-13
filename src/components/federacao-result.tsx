@@ -1,9 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { Candidato } from "@/lib/candidatos";
+import type { Candidato, DeputadoAtual } from "@/lib/candidatos";
 import { CandidatoCard } from "./candidato-card";
 import { PartidoBadge } from "./partido-badge";
+import { AtuaisDeputados } from "./atuais-deputados";
 
 export type Grupo = {
   tipo: "federacao" | "partido";
@@ -16,10 +17,12 @@ export function FederacaoResult({
   candidato,
   grupo,
   membros,
+  atuais,
 }: {
   candidato: Candidato;
   grupo: Grupo;
   membros: Candidato[];
+  atuais: DeputadoAtual[];
 }) {
   const [filtro, setFiltro] = useState("");
 
@@ -93,6 +96,8 @@ export function FederacaoResult({
           </div>
         )}
       </div>
+
+      <AtuaisDeputados atuais={atuais} />
     </section>
   );
 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCandidato, getFederacaoMembros, getPartidoMembros } from "@/lib/candidatos";
+import { getAtuaisPorPartidos, getCandidato, getFederacaoMembros, getPartidoMembros } from "@/lib/candidatos";
 import { ordenarPorRelevancia } from "@/lib/popularidade";
 
 export async function GET(request: NextRequest) {
@@ -17,10 +17,14 @@ export async function GET(request: NextRequest) {
   }
 
   if (candidato.federacaoNr) {
-    const membros = await ordenarPorRelevancia(
-      uf,
-      await getFederacaoMembros(uf, candidato.cargo, candidato.federacaoNr)
-    );
+    const siglas = (candidato.federacaoComposicao ?? "")
+      .split("/")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const [membros, atuais] = await Promise.all([
+      ordenarPorRelevancia(uf, await getFederacaoMembros(uf, candidato.cargo, candidato.federacaoNr)),
+      getAtuaisPorPartidos(uf, candidato.cargo, siglas),
+    ]);
     return NextResponse.json({
       candidato,
       grupo: {
@@ -30,13 +34,14 @@ export async function GET(request: NextRequest) {
         composicao: candidato.federacaoComposicao,
       },
       membros,
+      atuais,
     });
   }
 
-  const membros = await ordenarPorRelevancia(
-    uf,
-    await getPartidoMembros(uf, candidato.cargo, candidato.partidoSigla)
-  );
+  const [membros, atuais] = await Promise.all([
+    ordenarPorRelevancia(uf, await getPartidoMembros(uf, candidato.cargo, candidato.partidoSigla)),
+    getAtuaisPorPartidos(uf, candidato.cargo, [candidato.partidoSigla]),
+  ]);
   return NextResponse.json({
     candidato,
     grupo: {
@@ -46,5 +51,6 @@ export async function GET(request: NextRequest) {
       composicao: null,
     },
     membros,
+    atuais,
   });
 }

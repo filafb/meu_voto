@@ -42,8 +42,22 @@ export default async function Home() {
       <VotoForm ufs={ufs} />
 
       <footer className="mt-auto border-t border-line pt-6 text-xs text-ink-muted">
-        Fonte dos dados: TSE — Sistema CAND/Candex, conjunto &quot;Candidatos - 2026&quot;. Este
-        projeto não é afiliado ao TSE.
+        <p>
+          Fonte dos dados: TSE — Sistema CAND/Candex, conjunto &quot;Candidatos - 2026&quot;. Este
+          projeto não é afiliado ao TSE.
+        </p>
+        <p className="mt-2">
+          Projeto de código aberto —{" "}
+          <a
+            href="https://github.com/filafb/meu_voto"
+            target="_blank"
+            rel="noreferrer"
+            className="underline underline-offset-2 hover:text-ink"
+          >
+            veja o código no GitHub
+          </a>
+          .
+        </p>
       </footer>
     </main>
   );

@@ -76,6 +76,19 @@ já encerrada), então normalmente não faz parte da atualização de rotina.
    sem CPF, só `SQ_CANDIDATO_2026 -> total de votos`). Rode `build-data.mjs`
    de novo depois para incorporar o resultado.
 
+**Deputadas/os atuais** (eleitas/os em 2022, mostradas/os por partido da
+federação — quem já foi eleito por aquela legenda, independente de estar
+concorrendo em 2026). Também não muda mais; normalmente não faz parte da
+atualização de rotina. Reaproveita a pasta `consulta_cand_2022_<UF>.csv` já
+baixada para os votos de 2022 acima:
+
+```bash
+CAND2022_RAW_DIR=<pasta candidatos 2022> node scripts/build-atuais.mjs
+```
+
+Gera `public/data/atuais-<UF>.json` (nome, partido, cargo — sem CPF ou
+qualquer outro dado sensível).
+
 **Fotos dos candidatos:**
 
 1. Baixe, pelo navegador, um zip por UF:
