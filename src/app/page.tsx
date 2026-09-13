@@ -58,6 +58,11 @@ export default async function Home() {
           </a>
           .
         </p>
+        <p className="mt-2">
+          Não usamos cookies nem coletamos dados pessoais de quem visita. Guardamos apenas
+          contagens anônimas e agregadas (visitas às páginas e quantas vezes cada candidata/o foi
+          buscada/o), sem nenhuma informação que identifique você.
+        </p>
       </footer>
     </main>
   );
