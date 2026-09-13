@@ -15,8 +15,8 @@ export default async function Home() {
           Para quem vai o seu voto
         </h1>
         <p className="mt-4 max-w-2xl text-ink-muted">
-          Quando você vota em uma candidata/o, o seu voto ajuda a eleger todas as outras
-          candidatas/os da{" "}
+          Quando você vota em uma candidata/o a deputada/o estadual ou federal, o seu voto ajuda a
+          eleger todas as outras candidatas/os da{" "}
           <TermoExplicado
             termo="federação"
             explicacao="Federação partidária: união de dois ou mais partidos que passam a atuar como uma única legenda nas eleições, por pelo menos 4 anos. Os votos de todas as candidatas e candidatos da federação, de todos os partidos que a compõem, são somados para calcular quantas vagas a federação conquista — por isso seu voto também ajuda colegas de outros partidos dentro da mesma federação."

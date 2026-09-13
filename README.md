@@ -117,7 +117,10 @@ Para ativar na Vercel:
 
 1. No projeto na Vercel, vá em **Storage** → adicione a integração **Redis**
    (Marketplace, provedor Upstash) — isso cria automaticamente as variáveis
-   `UPSTASH_REDIS_REST_URL` e `UPSTASH_REDIS_REST_TOKEN` no projeto.
+   de conexão no projeto. Dependendo do fluxo, elas vêm como
+   `UPSTASH_REDIS_REST_URL`/`UPSTASH_REDIS_REST_TOKEN` ou, com a nomenclatura
+   legada do Vercel KV, `KV_REST_API_URL`/`KV_REST_API_TOKEN` — o app aceita
+   as duas (confira em Settings → Environment Variables qual delas apareceu).
 2. Redeploy. Cada seleção de candidata/o no autocomplete incrementa o
    contador dela via `POST /api/candidatos`; as buscas seguintes já saem
    ordenadas por popularidade.

@@ -18,13 +18,14 @@ import { Redis } from "@upstash/redis";
 
 const REVALIDATE_SEGUNDOS = 300;
 
-const redis =
-  process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
-    ? new Redis({
-        url: process.env.UPSTASH_REDIS_REST_URL,
-        token: process.env.UPSTASH_REDIS_REST_TOKEN,
-      })
-    : null;
+// A integração "Redis" do Vercel Marketplace pode injetar as variáveis com
+// nomes diferentes dependendo do provedor/fluxo (ex.: KV_REST_API_URL/TOKEN,
+// nomenclatura legada do antigo Vercel KV, em vez de
+// UPSTASH_REDIS_REST_URL/TOKEN) — por isso aceitamos as duas.
+const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
+const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
+
+const redis = REDIS_URL && REDIS_TOKEN ? new Redis({ url: REDIS_URL, token: REDIS_TOKEN }) : null;
 
 function chave(uf: string) {
   return `popularidade:${uf.toUpperCase()}`;

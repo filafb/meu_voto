@@ -64,15 +64,15 @@ export function CandidatoPicker({ uf, value, onChange }: Props) {
       </label>
 
       {value ? (
-        <div className="flex items-center justify-between border border-ink bg-card px-4 py-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <p className="font-heading text-lg leading-none">{value.nomeUrna}</p>
-              <CargoTag cargo={value.cargo} />
-            </div>
+        <div className="flex items-start justify-between gap-3 border border-ink bg-card px-4 py-3">
+          <div className="min-w-0">
+            <p className="break-words font-heading text-lg leading-tight">{value.nomeUrna}</p>
             <p className="mt-1 text-xs text-ink-muted">
               {value.partidoSigla} · nº {value.numero}
             </p>
+            <div className="mt-2">
+              <CargoTag cargo={value.cargo} />
+            </div>
           </div>
           <button
             type="button"
@@ -81,7 +81,7 @@ export function CandidatoPicker({ uf, value, onChange }: Props) {
               setQuery("");
               setResults([]);
             }}
-            className="text-xs uppercase tracking-wide text-ink-muted underline underline-offset-2 hover:text-ink"
+            className="shrink-0 text-xs uppercase tracking-wide text-ink-muted underline underline-offset-2 hover:text-ink"
           >
             trocar
           </button>

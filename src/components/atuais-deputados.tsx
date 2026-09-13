@@ -18,7 +18,10 @@ export function AtuaisDeputados({
 
   return (
     <div className="border-y-2 border-ink bg-card p-6">
-      <h3 className="font-heading text-lg">Quem {ehFederacao ? "os partidos da federação" : "esse partido"} já elegeram</h3>
+      <h3 className="font-heading text-lg">
+        Quem {ehFederacao ? "os partidos da federação" : "esse partido"} já{" "}
+        {ehFederacao ? "elegeram" : "elegeu"}
+      </h3>
       <p className="mt-1 max-w-2xl text-sm text-ink-muted">
         Estas/es são as/os deputadas/os atuais (eleitas/os em 2022) por{" "}
         {ehFederacao ? "esses partidos" : "esse partido"}, no mesmo cargo e estado — vale conferir

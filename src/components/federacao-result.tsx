@@ -74,7 +74,7 @@ export function FederacaoResult({
       <AtuaisDeputados atuais={atuais} ehFederacao={ehFederacao} />
 
       <div className="p-6">
-        <div className="mb-4 flex items-center justify-between gap-4">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <h3 className="font-heading text-sm uppercase tracking-widest text-ink-muted">
             {ehFederacao ? "Demais candidatas/os da federação" : "Demais candidatas/os do partido"}{" "}
             em {candidato.uf}
@@ -84,7 +84,7 @@ export function FederacaoResult({
             value={filtro}
             onChange={(e) => setFiltro(e.target.value)}
             placeholder="filtrar por nome ou partido"
-            className="border border-line bg-card px-3 py-1.5 text-sm outline-none focus:border-ink"
+            className="w-full border border-line bg-card px-3 py-1.5 text-sm outline-none focus:border-ink sm:w-64"
           />
         </div>
 
