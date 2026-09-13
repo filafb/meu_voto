@@ -6,6 +6,12 @@ import type { Candidato } from "@/lib/candidatos";
 import { CandidatoFoto } from "./candidato-foto";
 import { CargoTag } from "./cargo-tag";
 
+const formatoMoeda = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+  maximumFractionDigits: 0,
+});
+
 function capitalizar(s: string | null) {
   if (!s) return null;
   return s
@@ -42,10 +48,10 @@ export function CandidatoModal({
     ["Idade", candidato.idade ? `${candidato.idade} anos` : null],
     ["Naturalidade", naturalidade || null],
     ["Gênero", capitalizar(candidato.genero)],
-    ["Cor/raça", capitalizar(candidato.corRaca)],
-    ["Estado civil", capitalizar(candidato.estadoCivil)],
-    ["Escolaridade", capitalizar(candidato.grauInstrucao)],
-    ["Ocupação", capitalizar(candidato.ocupacao)],
+    [
+      "Patrimônio declarado",
+      candidato.patrimonio !== null ? formatoMoeda.format(candidato.patrimonio) : null,
+    ],
     [
       "Concorre à reeleição",
       candidato.reeleicao === null ? "Ainda não informado pelo TSE" : candidato.reeleicao ? "Sim" : "Não",

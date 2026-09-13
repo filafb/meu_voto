@@ -30,6 +30,7 @@ const arquivosPrincipais = arquivos.filter(
   (f) => f.startsWith("consulta_cand_2026_") && f.length === "consulta_cand_2026_XX.csv".length
 );
 const arquivosComplementares = arquivos.filter((f) => f.startsWith("consulta_cand_complementar_2026_"));
+const arquivosBens = arquivos.filter((f) => f.startsWith("bem_candidato_2026_"));
 
 // SQ_CANDIDATO -> informações complementares
 const complementarPorSq = new Map();
@@ -40,6 +41,16 @@ for (const file of arquivosComplementares) {
       reeleicao: paraBooleanOuNulo(row.ST_REELEICAO),
       municipioNascimento: row.NM_MUNICIPIO_NASCIMENTO || null,
     });
+  }
+}
+
+// SQ_CANDIDATO -> soma do patrimônio declarado (bens de candidatos)
+const patrimonioPorSq = new Map();
+for (const file of arquivosBens) {
+  for (const row of readCsv(file)) {
+    const valor = Number(row.VR_BEM_CANDIDATO.replace(",", "."));
+    if (!Number.isFinite(valor)) continue;
+    patrimonioPorSq.set(row.SQ_CANDIDATO, (patrimonioPorSq.get(row.SQ_CANDIDATO) ?? 0) + valor);
   }
 }
 
@@ -81,6 +92,7 @@ for (const file of arquivosPrincipais) {
       municipioNascimento: complementar.municipioNascimento ?? null,
       idade: complementar.idade ?? null,
       reeleicao: complementar.reeleicao ?? null,
+      patrimonio: patrimonioPorSq.get(row.SQ_CANDIDATO) ?? null,
     };
 
     if (!byUf.has(uf)) byUf.set(uf, []);

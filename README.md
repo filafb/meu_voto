@@ -37,24 +37,27 @@ Manager e bloqueia clientes não-navegador (curl, wget, scripts) com 403,
 mesmo a partir de um IP residencial brasileiro válido — os downloads abaixo
 só funcionam por um navegador de verdade.
 
-**Candidatos e informações complementares** (nome, partido, federação,
-idade, reeleição, etc.):
+**Candidatos, informações complementares e bens** (nome, partido, federação,
+idade, reeleição, patrimônio declarado, etc.):
 
 1. Baixe, pelo navegador:
    - <https://cdn.tse.jus.br/estatistica/sead/odsele/consulta_cand/consulta_cand_2026.zip>
    - <https://cdn.tse.jus.br/estatistica/sead/odsele/consulta_cand_complementar/consulta_cand_complementar_2026.zip>
-2. Extraia os arquivos `consulta_cand_2026_<UF>.csv` e
-   `consulta_cand_complementar_2026_<UF>.csv` para `data/raw/`.
+   - <https://cdn.tse.jus.br/estatistica/sead/odsele/bem_candidato/bem_candidato_2026.zip>
+2. Extraia os arquivos `consulta_cand_2026_<UF>.csv`,
+   `consulta_cand_complementar_2026_<UF>.csv` e `bem_candidato_2026_<UF>.csv`
+   para `data/raw/`.
 3. Rode `node scripts/build-data.mjs`, que regenera os arquivos em
-   `public/data/`.
+   `public/data/` (o patrimônio é a soma de `VR_BEM_CANDIDATO` por candidata/o).
 
 **Fotos dos candidatos:**
 
 1. Baixe, pelo navegador, um zip por UF:
    `https://cdn.tse.jus.br/estatistica/sead/eleicoes/eleicoes2026/fotos/foto_cand2026_<UF>_div.zip`
 2. Extraia cada zip em uma pasta própria por UF, ex.: `<pasta>/<UF>/*.jpg`.
-3. Rode `FOTOS_RAW_DIR=<pasta> node scripts/build-fotos.mjs`, que copia só as
-   fotos das/os candidatas/os usadas pelo app para `public/fotos/<SQ>.jpg`.
+3. Rode `FOTOS_RAW_DIR=<pasta> node scripts/build-fotos.mjs`, que converte
+   para WebP e copia só as fotos das/os candidatas/os usadas pelo app para
+   `public/fotos/<SQ>.webp`.
 
 Reinicie o servidor de dev depois de regenerar os dados — os arquivos de
 `public/data/` ficam em cache de processo enquanto o servidor roda.

@@ -39,7 +39,7 @@ export function CandidatoFoto({
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={`/fotos/${candidato.sq}.jpg`}
+      src={`/fotos/${candidato.sq}.webp`}
       alt={candidato.nomeUrna}
       onError={() => setErro(true)}
       className={`shrink-0 border object-cover ${classeBase} ${

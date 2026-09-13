@@ -26,6 +26,7 @@ export type Candidato = {
   municipioNascimento: string | null;
   idade: number | null;
   reeleicao: boolean | null;
+  patrimonio: number | null;
 };
 
 const DATA_DIR = join(process.cwd(), "public", "data");

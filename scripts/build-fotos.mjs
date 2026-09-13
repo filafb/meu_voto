@@ -1,14 +1,16 @@
-// One-off build script: copies only the candidate photos we actually use
-// (deputada/o federal e estadual, from public/data/candidatos-<UF>.json) out
-// of the raw TSE photo dumps into public/fotos/<SQ_CANDIDATO>.jpg.
+// One-off build script: converts and copies only the candidate photos we
+// actually use (deputada/o federal e estadual, from
+// public/data/candidatos-<UF>.json) out of the raw TSE photo dumps into
+// public/fotos/<SQ_CANDIDATO>.webp.
 //
 // Raw photos come from https://dadosabertos.tse.jus.br/dataset/candidatos-2026
 // ("<UF> - Fotos de candidatos"), one zip per UF at
 // https://cdn.tse.jus.br/estatistica/sead/eleicoes/eleicoes2026/fotos/foto_cand2026_<UF>_div.zip
 // extracted (per UF) into FOTOS_RAW_DIR before running this script. Filenames
 // inside follow the pattern F<UF><SQ_CANDIDATO>_div.jpg.
-import { readFileSync, readdirSync, mkdirSync, copyFileSync, existsSync } from "node:fs";
+import { readFileSync, readdirSync, mkdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
+import sharp from "sharp";
 
 const DATA_DIR = join(process.cwd(), "public", "data");
 const FOTOS_RAW_DIR = process.env.FOTOS_RAW_DIR;
@@ -23,7 +25,7 @@ mkdirSync(OUT_DIR, { recursive: true });
 
 const ufs = JSON.parse(readFileSync(join(DATA_DIR, "ufs.json"), "utf-8"));
 
-let copiadas = 0;
+let convertidas = 0;
 let semFoto = 0;
 
 for (const uf of ufs) {
@@ -43,9 +45,11 @@ for (const uf of ufs) {
       semFoto++;
       continue;
     }
-    copyFileSync(join(rawUfDir, nomeArquivo), join(OUT_DIR, `${c.sq}.jpg`));
-    copiadas++;
+    await sharp(join(rawUfDir, nomeArquivo))
+      .webp({ quality: 75 })
+      .toFile(join(OUT_DIR, `${c.sq}.webp`));
+    convertidas++;
   }
 }
 
-console.log(`Fotos copiadas: ${copiadas}. Sem foto disponível: ${semFoto}.`);
+console.log(`Fotos convertidas para WebP: ${convertidas}. Sem foto disponível: ${semFoto}.`);
