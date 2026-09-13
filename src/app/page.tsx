@@ -15,8 +15,9 @@ export default async function Home() {
         </h1>
         <p className="mt-4 max-w-2xl text-ink-muted">
           Escolha seu estado e busque a candidata/o a deputada/o federal ou estadual em quem
-          pretende votar. Mostramos a federação partidária correspondente e todas as demais
-          candidatas/os que integram a mesma federação no seu estado. Dados oficiais do{" "}
+          pretende votar. Mostramos a federação partidária correspondente (ou, quando o partido não
+          integra nenhuma, as/os demais candidatas/os do próprio partido) no seu estado. Dados
+          oficiais do{" "}
           <a
             href="https://dadosabertos.tse.jus.br/dataset/candidatos-2026"
             target="_blank"

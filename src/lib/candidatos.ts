@@ -79,6 +79,17 @@ export async function getFederacaoMembros(
     .sort((a, b) => a.partidoSigla.localeCompare(b.partidoSigla) || a.nomeUrna.localeCompare(b.nomeUrna));
 }
 
+export async function getPartidoMembros(
+  uf: string,
+  cargo: Cargo,
+  partidoSigla: string
+): Promise<Candidato[]> {
+  const all = await loadUf(uf);
+  return all
+    .filter((c) => c.cargo === cargo && c.partidoSigla === partidoSigla)
+    .sort((a, b) => a.nomeUrna.localeCompare(b.nomeUrna));
+}
+
 const DIACRITICS = new RegExp("[\\u0300-\\u036f]", "g");
 
 export function normalize(s: string): string {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCandidato, getFederacaoMembros } from "@/lib/candidatos";
+import { getCandidato, getFederacaoMembros, getPartidoMembros } from "@/lib/candidatos";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -12,21 +12,31 @@ export async function GET(request: NextRequest) {
 
   const candidato = await getCandidato(uf, sq);
   if (!candidato) {
-    return NextResponse.json({ error: "Candidato não encontrado" }, { status: 404 });
+    return NextResponse.json({ error: "Candidata/o não encontrada/o" }, { status: 404 });
   }
 
-  if (!candidato.federacaoNr) {
-    return NextResponse.json({ candidato, federacao: null, membros: [] });
+  if (candidato.federacaoNr) {
+    const membros = await getFederacaoMembros(uf, candidato.cargo, candidato.federacaoNr);
+    return NextResponse.json({
+      candidato,
+      grupo: {
+        tipo: "federacao",
+        nome: candidato.federacaoNome,
+        sigla: candidato.federacaoSigla,
+        composicao: candidato.federacaoComposicao,
+      },
+      membros,
+    });
   }
 
-  const membros = await getFederacaoMembros(uf, candidato.cargo, candidato.federacaoNr);
+  const membros = await getPartidoMembros(uf, candidato.cargo, candidato.partidoSigla);
   return NextResponse.json({
     candidato,
-    federacao: {
-      nr: candidato.federacaoNr,
-      sigla: candidato.federacaoSigla,
-      nome: candidato.federacaoNome,
-      composicao: candidato.federacaoComposicao,
+    grupo: {
+      tipo: "partido",
+      nome: candidato.partidoNome,
+      sigla: candidato.partidoSigla,
+      composicao: null,
     },
     membros,
   });

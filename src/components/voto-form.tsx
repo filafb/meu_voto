@@ -1,24 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Candidato } from "@/lib/candidatos";
 import { UF_NOMES } from "@/lib/uf-nomes";
 import { CandidatoPicker } from "./candidato-picker";
-import { FederacaoResult } from "./federacao-result";
+import { FederacaoResult, type Grupo } from "./federacao-result";
 
 type Resultado = {
   candidato: Candidato;
-  federacao: {
-    nr: number;
-    sigla: string | null;
-    nome: string | null;
-    composicao: string | null;
-  } | null;
+  grupo: Grupo;
   membros: Candidato[];
 };
 
+const UF_STORAGE_KEY = "meu-voto:uf";
+
 export function VotoForm({ ufs }: { ufs: string[] }) {
   const [uf, setUf] = useState("");
+
+  useEffect(() => {
+    try {
+      const salvo = localStorage.getItem(UF_STORAGE_KEY);
+      if (salvo && ufs.includes(salvo)) setUf(salvo);
+    } catch {
+      // localStorage indisponível (modo privado etc.) — segue sem estado salvo
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const [candidato, setCandidato] = useState<Candidato | null>(null);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -52,8 +60,15 @@ export function VotoForm({ ufs }: { ufs: string[] }) {
             <select
               value={uf}
               onChange={(e) => {
-                setUf(e.target.value);
+                const novoUf = e.target.value;
+                setUf(novoUf);
                 setResultado(null);
+                try {
+                  if (novoUf) localStorage.setItem(UF_STORAGE_KEY, novoUf);
+                  else localStorage.removeItem(UF_STORAGE_KEY);
+                } catch {
+                  // ignora se localStorage não estiver disponível
+                }
               }}
               className="border border-line bg-card px-4 py-3 text-base outline-none focus:border-ink sm:max-w-sm"
             >
@@ -93,7 +108,7 @@ export function VotoForm({ ufs }: { ufs: string[] }) {
       {resultado && (
         <FederacaoResult
           candidato={resultado.candidato}
-          federacao={resultado.federacao}
+          grupo={resultado.grupo}
           membros={resultado.membros}
         />
       )}
