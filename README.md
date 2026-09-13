@@ -1,8 +1,9 @@
-# Meu Voto 2026
+# Para quem vai o seu voto
 
-Descubra a federação partidária do seu candidato a deputado federal ou estadual
-nas eleições de 2026, e todos os outros candidatos que integram a mesma
-federação no seu estado.
+[paraquemvaioseuvoto.com.br](https://paraquemvaioseuvoto.com.br) — descubra a
+federação partidária da sua candidata/o a deputada/o federal ou estadual nas
+eleições de 2026, e todas/os as/os outras/os candidatas/os que integram a
+mesma federação no seu estado.
 
 Dados oficiais do [Portal de Dados Abertos do
 TSE](https://dadosabertos.tse.jus.br/dataset/candidatos-2026) (conjunto
@@ -38,7 +39,7 @@ mesmo a partir de um IP residencial brasileiro válido — os downloads abaixo
 só funcionam por um navegador de verdade.
 
 **Candidatos, informações complementares e bens** (nome, partido, federação,
-idade, reeleição, patrimônio declarado, etc.):
+idade, patrimônio declarado, etc.):
 
 1. Baixe, pelo navegador:
    - <https://cdn.tse.jus.br/estatistica/sead/odsele/consulta_cand/consulta_cand_2026.zip>
@@ -49,6 +50,31 @@ idade, reeleição, patrimônio declarado, etc.):
    para `data/raw/`.
 3. Rode `node scripts/build-data.mjs`, que regenera os arquivos em
    `public/data/` (o patrimônio é a soma de `VR_BEM_CANDIDATO` por candidata/o).
+
+**Votos recebidos em 2022** (usados como critério de desempate na ordenação,
+atrás da popularidade de busca — ver seção abaixo):
+
+Só precisa ser refeito se os dados de 2022 mudarem (não mudam mais — eleição
+já encerrada), então normalmente não faz parte da atualização de rotina.
+
+1. Baixe, pelo navegador:
+   - <https://cdn.tse.jus.br/estatistica/sead/odsele/consulta_cand/consulta_cand_2022.zip>
+   - <https://cdn.tse.jus.br/estatistica/sead/odsele/votacao_candidato_munzona/votacao_candidato_munzona_2022.zip>
+     (⚠️ grande: ~600MB compactado, ~4GB por UF descompactado — baixe só os
+     arquivos `votacao_candidato_munzona_2022_<UF>.csv`, ignore o `_BRASIL.csv`
+     nacional redundante)
+2. Extraia cada um em uma pasta própria.
+3. Rode:
+   ```bash
+   CAND2022_RAW_DIR=<pasta candidatos 2022> \
+   VOTACAO_RAW_DIR=<pasta votação 2022> \
+   node scripts/build-votos2022.mjs
+   ```
+   Isso casa candidatas/os de 2026 com suas candidaturas de 2022 pelo CPF
+   (usado só como chave de junção — nunca é salvo ou exposto) e soma os votos
+   nominais válidos de cada uma/um, gerando `data/votos2022.json` (pequeno,
+   sem CPF, só `SQ_CANDIDATO_2026 -> total de votos`). Rode `build-data.mjs`
+   de novo depois para incorporar o resultado.
 
 **Fotos dos candidatos:**
 
@@ -62,12 +88,17 @@ idade, reeleição, patrimônio declarado, etc.):
 Reinicie o servidor de dev depois de regenerar os dados — os arquivos de
 `public/data/` ficam em cache de processo enquanto o servidor roda.
 
-## Ordenação por popularidade (opcional)
+## Ordenação por relevância
 
-As listas de candidatas/os (busca e "demais candidatas/os da federação") podem
-ser ordenadas colocando primeiro quem já foi mais escolhido no app, contado
-por estado num sorted set do Redis. Isso é **opcional**: sem configurar,
-tudo funciona normalmente na ordem padrão (sem chamadas a Redis).
+As listas de candidatas/os (busca e "demais candidatas/os da federação") são
+ordenadas por dois critérios, nessa prioridade:
+
+1. Popularidade de busca no próprio app — quantas vezes foi escolhida no
+   autocomplete, contado por estado num sorted set do Redis. **Opcional**:
+   sem Redis configurado, esse critério não entra (vira empate geral) e a
+   ordenação usa só o critério 2.
+2. Votos recebidos em 2022 (desempate) — sempre disponível, não depende de
+   Redis.
 
 Para ativar na Vercel:
 

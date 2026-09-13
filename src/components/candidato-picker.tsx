@@ -76,7 +76,11 @@ export function CandidatoPicker({ uf, value, onChange }: Props) {
           </div>
           <button
             type="button"
-            onClick={() => onChange(null)}
+            onClick={() => {
+              onChange(null);
+              setQuery("");
+              setResults([]);
+            }}
             className="text-xs uppercase tracking-wide text-ink-muted underline underline-offset-2 hover:text-ink"
           >
             trocar

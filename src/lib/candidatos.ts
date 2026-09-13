@@ -25,8 +25,8 @@ export type Candidato = {
   ufNascimento: string | null;
   municipioNascimento: string | null;
   idade: number | null;
-  reeleicao: boolean | null;
   patrimonio: number | null;
+  votos2022: number | null;
 };
 
 const DATA_DIR = join(process.cwd(), "public", "data");
@@ -64,13 +64,11 @@ export async function searchCandidatos(uf: string, query: string): Promise<Candi
 
   const isNumero = /^\d+$/.test(trimmed);
   if (isNumero) {
-    return all.filter((c) => c.numero.startsWith(trimmed)).slice(0, 30);
+    return all.filter((c) => c.numero.startsWith(trimmed));
   }
 
   const q = normalize(trimmed);
-  return all
-    .filter((c) => normalize(c.nomeUrna).includes(q) || normalize(c.nome).includes(q))
-    .slice(0, 30);
+  return all.filter((c) => normalize(c.nomeUrna).includes(q) || normalize(c.nome).includes(q));
 }
 
 export async function getCandidato(uf: string, sq: string): Promise<Candidato | undefined> {

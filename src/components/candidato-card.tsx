@@ -5,6 +5,8 @@ import type { Candidato } from "@/lib/candidatos";
 import { CandidatoFoto } from "./candidato-foto";
 import { CandidatoModal } from "./candidato-modal";
 
+const formatoNumero = new Intl.NumberFormat("pt-BR");
+
 export function CandidatoCard({
   candidato,
   destaque = false,
@@ -39,18 +41,14 @@ export function CandidatoCard({
         >
           {candidato.nomeUrna}
         </button>
-        {candidato.reeleicao && (
-          <span
-            className={`ml-2 inline-block border px-1.5 py-0.5 align-middle text-[10px] font-medium uppercase tracking-wide ${
-              destaque ? "border-paper/40 text-paper/80" : "border-ink/30 text-ink-muted"
-            }`}
-          >
-            Reeleição
-          </span>
-        )}
         <p className={`mt-1 text-sm ${destaque ? "text-paper/70" : "text-ink-muted"}`}>
           {candidato.nome}
         </p>
+        {candidato.votos2022 !== null && (
+          <p className={`mt-1 text-xs ${destaque ? "text-paper/60" : "text-ink-muted"}`}>
+            {formatoNumero.format(candidato.votos2022)} votos em 2022
+          </p>
+        )}
       </div>
 
       <div

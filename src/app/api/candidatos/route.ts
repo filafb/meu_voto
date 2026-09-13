@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { searchCandidatos } from "@/lib/candidatos";
-import { ordenarPorPopularidade, registrarSelecao } from "@/lib/popularidade";
+import { ordenarPorRelevancia, registrarSelecao } from "@/lib/popularidade";
+
+const MAX_RESULTADOS = 30;
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -12,8 +14,8 @@ export async function GET(request: NextRequest) {
   }
 
   const candidatos = await searchCandidatos(uf, q);
-  const ordenados = await ordenarPorPopularidade(uf, candidatos);
-  return NextResponse.json({ candidatos: ordenados });
+  const ordenados = await ordenarPorRelevancia(uf, candidatos);
+  return NextResponse.json({ candidatos: ordenados.slice(0, MAX_RESULTADOS) });
 }
 
 export async function POST(request: NextRequest) {

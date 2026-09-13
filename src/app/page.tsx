@@ -12,7 +12,7 @@ export default async function Home() {
           Eleições 2026
         </p>
         <h1 className="mt-3 font-heading text-4xl leading-tight sm:text-5xl">
-          Para onde vai o seu voto
+          Para quem vai o seu voto
         </h1>
         <p className="mt-4 max-w-2xl text-ink-muted">
           Quando você vota em uma candidata/o, o seu voto ajuda a eleger todas as outras

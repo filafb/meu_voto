@@ -12,6 +12,8 @@ const formatoMoeda = new Intl.NumberFormat("pt-BR", {
   maximumFractionDigits: 0,
 });
 
+const formatoNumero = new Intl.NumberFormat("pt-BR");
+
 function capitalizar(s: string | null) {
   if (!s) return null;
   return s
@@ -49,12 +51,12 @@ export function CandidatoModal({
     ["Naturalidade", naturalidade || null],
     ["Gênero", capitalizar(candidato.genero)],
     [
-      "Patrimônio declarado",
-      candidato.patrimonio !== null ? formatoMoeda.format(candidato.patrimonio) : null,
+      "Votos em 2022",
+      candidato.votos2022 !== null ? `${formatoNumero.format(candidato.votos2022)} votos` : null,
     ],
     [
-      "Concorre à reeleição",
-      candidato.reeleicao === null ? "Ainda não informado pelo TSE" : candidato.reeleicao ? "Sim" : "Não",
+      "Patrimônio declarado",
+      candidato.patrimonio !== null ? formatoMoeda.format(candidato.patrimonio) : null,
     ],
   ];
 
@@ -78,11 +80,6 @@ export function CandidatoModal({
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="font-heading text-2xl leading-tight">{candidato.nomeUrna}</h2>
                 <CargoTag cargo={candidato.cargo} />
-                {candidato.reeleicao && (
-                  <span className="border border-ink/30 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-ink-muted">
-                    Reeleição
-                  </span>
-                )}
               </div>
               <p className="mt-1 text-sm text-ink-muted">{candidato.nome}</p>
               <p className="mt-1 text-sm text-ink-muted">

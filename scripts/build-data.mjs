@@ -2,14 +2,20 @@
 // "consulta_cand_complementar_2026_<UF>.csv" files (data/raw/, ISO-8859-1,
 // ';'-delimited) into compact per-UF JSON files consumed by the app
 // (public/data/candidatos-<uf>.json). Not run at request time.
-import { readFileSync, readdirSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, readdirSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import iconv from "iconv-lite";
 import { parse } from "csv-parse/sync";
 
 const RAW_DIR = join(process.cwd(), "data", "raw");
 const OUT_DIR = join(process.cwd(), "public", "data");
+const VOTOS2022_PATH = join(process.cwd(), "data", "votos2022.json");
 mkdirSync(OUT_DIR, { recursive: true });
+
+// SQ_CANDIDATO (2026) -> votos recebidos em 2022 (ver scripts/build-votos2022.mjs)
+const votos2022PorSq = existsSync(VOTOS2022_PATH)
+  ? JSON.parse(readFileSync(VOTOS2022_PATH, "utf-8"))
+  : {};
 
 const CARGOS = new Set(["DEPUTADO FEDERAL", "DEPUTADO ESTADUAL"]);
 
@@ -17,12 +23,6 @@ function readCsv(fileName) {
   const buf = readFileSync(join(RAW_DIR, fileName));
   const text = iconv.decode(buf, "iso-8859-1");
   return parse(text, { columns: true, delimiter: ";", quote: '"', skip_empty_lines: true });
-}
-
-function paraBooleanOuNulo(valor) {
-  if (valor === "S") return true;
-  if (valor === "N") return false;
-  return null; // "#NE" (não definido ainda) ou "Não divulgável"
 }
 
 const arquivos = readdirSync(RAW_DIR).filter((f) => f.endsWith(".csv"));
@@ -38,7 +38,6 @@ for (const file of arquivosComplementares) {
   for (const row of readCsv(file)) {
     complementarPorSq.set(row.SQ_CANDIDATO, {
       idade: row.NR_IDADE_DATA_POSSE ? Number(row.NR_IDADE_DATA_POSSE) : null,
-      reeleicao: paraBooleanOuNulo(row.ST_REELEICAO),
       municipioNascimento: row.NM_MUNICIPIO_NASCIMENTO || null,
     });
   }
@@ -91,8 +90,8 @@ for (const file of arquivosPrincipais) {
       ufNascimento: row.SG_UF_NASCIMENTO || null,
       municipioNascimento: complementar.municipioNascimento ?? null,
       idade: complementar.idade ?? null,
-      reeleicao: complementar.reeleicao ?? null,
       patrimonio: patrimonioPorSq.get(row.SQ_CANDIDATO) ?? null,
+      votos2022: votos2022PorSq[row.SQ_CANDIDATO] ?? null,
     };
 
     if (!byUf.has(uf)) byUf.set(uf, []);
