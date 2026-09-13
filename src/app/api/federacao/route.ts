@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCandidato, getFederacaoMembros, getPartidoMembros } from "@/lib/candidatos";
+import { ordenarPorPopularidade } from "@/lib/popularidade";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -16,7 +17,10 @@ export async function GET(request: NextRequest) {
   }
 
   if (candidato.federacaoNr) {
-    const membros = await getFederacaoMembros(uf, candidato.cargo, candidato.federacaoNr);
+    const membros = await ordenarPorPopularidade(
+      uf,
+      await getFederacaoMembros(uf, candidato.cargo, candidato.federacaoNr)
+    );
     return NextResponse.json({
       candidato,
       grupo: {
@@ -29,7 +33,10 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  const membros = await getPartidoMembros(uf, candidato.cargo, candidato.partidoSigla);
+  const membros = await ordenarPorPopularidade(
+    uf,
+    await getPartidoMembros(uf, candidato.cargo, candidato.partidoSigla)
+  );
   return NextResponse.json({
     candidato,
     grupo: {

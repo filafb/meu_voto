@@ -109,6 +109,11 @@ export function CandidatoPicker({ uf, value, onChange }: Props) {
               onClick={() => {
                 onChange(c);
                 setOpen(false);
+                fetch("/api/candidatos", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ uf, sq: c.sq }),
+                }).catch(() => {});
               }}
               className="flex w-full items-center justify-between gap-3 border-b border-line px-4 py-2.5 text-left last:border-none hover:bg-paper"
             >

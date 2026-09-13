@@ -62,7 +62,27 @@ idade, reeleição, patrimônio declarado, etc.):
 Reinicie o servidor de dev depois de regenerar os dados — os arquivos de
 `public/data/` ficam em cache de processo enquanto o servidor roda.
 
+## Ordenação por popularidade (opcional)
+
+As listas de candidatas/os (busca e "demais candidatas/os da federação") podem
+ser ordenadas colocando primeiro quem já foi mais escolhido no app, contado
+por estado num sorted set do Redis. Isso é **opcional**: sem configurar,
+tudo funciona normalmente na ordem padrão (sem chamadas a Redis).
+
+Para ativar na Vercel:
+
+1. No projeto na Vercel, vá em **Storage** → adicione a integração **Redis**
+   (Marketplace, provedor Upstash) — isso cria automaticamente as variáveis
+   `UPSTASH_REDIS_REST_URL` e `UPSTASH_REDIS_REST_TOKEN` no projeto.
+2. Redeploy. Cada seleção de candidata/o no autocomplete incrementa o
+   contador dela via `POST /api/candidatos`; as buscas seguintes já saem
+   ordenadas por popularidade.
+
+Para rodar localmente com a mesma ordenação, copie essas duas variáveis para
+um `.env.local`.
+
 ## Deploy
 
 Projeto pronto para deploy na [Vercel](https://vercel.com/new) — é uma
-aplicação Next.js padrão, sem variáveis de ambiente ou serviços externos.
+aplicação Next.js padrão. Nenhuma variável de ambiente é obrigatória; Redis é
+opcional (ver seção acima).
