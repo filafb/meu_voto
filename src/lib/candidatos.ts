@@ -17,6 +17,15 @@ export type Candidato = {
   federacaoSigla: string | null;
   federacaoNome: string | null;
   federacaoComposicao: string | null;
+  genero: string | null;
+  corRaca: string | null;
+  grauInstrucao: string | null;
+  estadoCivil: string | null;
+  ocupacao: string | null;
+  ufNascimento: string | null;
+  municipioNascimento: string | null;
+  idade: number | null;
+  reeleicao: boolean | null;
 };
 
 const DATA_DIR = join(process.cwd(), "public", "data");

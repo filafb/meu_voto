@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { Candidato } from "@/lib/candidatos";
 import { CandidatoCard } from "./candidato-card";
+import { PartidoBadge } from "./partido-badge";
 
 export type Grupo = {
   tipo: "federacao" | "partido";
@@ -32,6 +33,9 @@ export function FederacaoResult({
   }, [membros, filtro, candidato.sq]);
 
   const ehFederacao = grupo.tipo === "federacao";
+  const partidosDaFederacao = ehFederacao
+    ? (grupo.composicao ?? "").split("/").map((s) => s.trim()).filter(Boolean)
+    : [];
 
   return (
     <section className="border border-line bg-paper">
@@ -44,9 +48,16 @@ export function FederacaoResult({
           <h2 className="mt-1 font-heading text-2xl">{grupo.nome}</h2>
           <p className="mt-1 text-sm text-ink-muted">
             {ehFederacao
-              ? `Federação partidária · composição: ${grupo.composicao}`
+              ? "Federação partidária"
               : `Partido sem federação — mostrando as/os demais candidatas/os do próprio partido (${grupo.sigla}) em ${candidato.uf}.`}
           </p>
+          {partidosDaFederacao.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {partidosDaFederacao.map((sigla) => (
+                <PartidoBadge key={sigla} sigla={sigla} />
+              ))}
+            </div>
+          )}
         </div>
         <p className="font-heading text-sm text-ink-muted">
           {membros.length > 0 ? `${membros.length} candidatas/os` : ""}

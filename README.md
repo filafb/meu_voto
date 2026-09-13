@@ -32,14 +32,32 @@ Abra [http://localhost:3000](http://localhost:3000).
 ## Atualizando os dados
 
 Os dados de candidaturas do TSE são atualizados 4x ao dia até o fim do
-processo eleitoral. Para atualizar:
+processo eleitoral. Importante: o CDN do TSE (`cdn.tse.jus.br`) usa Akamai Bot
+Manager e bloqueia clientes não-navegador (curl, wget, scripts) com 403,
+mesmo a partir de um IP residencial brasileiro válido — os downloads abaixo
+só funcionam por um navegador de verdade.
 
-1. Baixe o zip de candidatos em
-   <https://dadosabertos.tse.jus.br/dataset/candidatos-2026> (recurso
-   "Candidatos") — atenção: o CDN do TSE bloqueia acessos fora do Brasil.
-2. Extraia os arquivos `consulta_cand_2026_<UF>.csv` para `data/raw/`.
+**Candidatos e informações complementares** (nome, partido, federação,
+idade, reeleição, etc.):
+
+1. Baixe, pelo navegador:
+   - <https://cdn.tse.jus.br/estatistica/sead/odsele/consulta_cand/consulta_cand_2026.zip>
+   - <https://cdn.tse.jus.br/estatistica/sead/odsele/consulta_cand_complementar/consulta_cand_complementar_2026.zip>
+2. Extraia os arquivos `consulta_cand_2026_<UF>.csv` e
+   `consulta_cand_complementar_2026_<UF>.csv` para `data/raw/`.
 3. Rode `node scripts/build-data.mjs`, que regenera os arquivos em
    `public/data/`.
+
+**Fotos dos candidatos:**
+
+1. Baixe, pelo navegador, um zip por UF:
+   `https://cdn.tse.jus.br/estatistica/sead/eleicoes/eleicoes2026/fotos/foto_cand2026_<UF>_div.zip`
+2. Extraia cada zip em uma pasta própria por UF, ex.: `<pasta>/<UF>/*.jpg`.
+3. Rode `FOTOS_RAW_DIR=<pasta> node scripts/build-fotos.mjs`, que copia só as
+   fotos das/os candidatas/os usadas pelo app para `public/fotos/<SQ>.jpg`.
+
+Reinicie o servidor de dev depois de regenerar os dados — os arquivos de
+`public/data/` ficam em cache de processo enquanto o servidor roda.
 
 ## Deploy
 

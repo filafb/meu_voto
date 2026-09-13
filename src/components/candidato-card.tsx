@@ -1,9 +1,9 @@
-import type { Candidato } from "@/lib/candidatos";
+"use client";
 
-function initials(nome: string) {
-  const parts = nome.trim().split(/\s+/);
-  return ((parts[0]?.[0] ?? "") + (parts[1]?.[0] ?? "")).toUpperCase();
-}
+import { useState } from "react";
+import type { Candidato } from "@/lib/candidatos";
+import { CandidatoFoto } from "./candidato-foto";
+import { CandidatoModal } from "./candidato-modal";
 
 export function CandidatoCard({
   candidato,
@@ -12,6 +12,8 @@ export function CandidatoCard({
   candidato: Candidato;
   destaque?: boolean;
 }) {
+  const [modalAberto, setModalAberto] = useState(false);
+
   return (
     <div
       className={`group relative flex flex-col justify-between border p-5 transition-transform hover:-translate-y-0.5 ${
@@ -19,13 +21,7 @@ export function CandidatoCard({
       }`}
     >
       <div className="flex items-start justify-between gap-3">
-        <div
-          className={`flex h-11 w-11 shrink-0 items-center justify-center border font-heading text-sm ${
-            destaque ? "border-paper/40 text-paper" : "border-ink/20 text-ink"
-          }`}
-        >
-          {initials(candidato.nomeUrna)}
-        </div>
+        <CandidatoFoto candidato={candidato} dark={destaque} />
         <span
           className={`font-heading text-xs uppercase tracking-widest ${
             destaque ? "text-paper/60" : "text-ink-muted"
@@ -36,7 +32,22 @@ export function CandidatoCard({
       </div>
 
       <div className="mt-6">
-        <p className="font-heading text-xl leading-tight">{candidato.nomeUrna}</p>
+        <button
+          type="button"
+          onClick={() => setModalAberto(true)}
+          className="text-left font-heading text-xl leading-tight underline decoration-transparent underline-offset-4 transition-colors hover:decoration-current"
+        >
+          {candidato.nomeUrna}
+        </button>
+        {candidato.reeleicao && (
+          <span
+            className={`ml-2 inline-block border px-1.5 py-0.5 align-middle text-[10px] font-medium uppercase tracking-wide ${
+              destaque ? "border-paper/40 text-paper/80" : "border-ink/30 text-ink-muted"
+            }`}
+          >
+            Reeleição
+          </span>
+        )}
         <p className={`mt-1 text-sm ${destaque ? "text-paper/70" : "text-ink-muted"}`}>
           {candidato.nome}
         </p>
@@ -50,6 +61,10 @@ export function CandidatoCard({
         <span>{candidato.partidoSigla}</span>
         <span>{candidato.cargo === "federal" ? "Dep./a Federal" : "Dep./a Estadual"}</span>
       </div>
+
+      {modalAberto && (
+        <CandidatoModal candidato={candidato} onClose={() => setModalAberto(false)} />
+      )}
     </div>
   );
 }
