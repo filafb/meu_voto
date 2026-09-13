@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Meu Voto 2026
 
-## Getting Started
+Descubra a federação partidária do seu candidato a deputado federal ou estadual
+nas eleições de 2026, e todos os outros candidatos que integram a mesma
+federação no seu estado.
 
-First, run the development server:
+Dados oficiais do [Portal de Dados Abertos do
+TSE](https://dadosabertos.tse.jus.br/dataset/candidatos-2026) (conjunto
+"Candidatos - 2026").
+
+## Como funciona
+
+1. O usuário escolhe seu estado e o candidato a deputado federal e/ou estadual
+   em quem pretende votar.
+2. A aplicação mostra a federação partidária do candidato (quando houver) e
+   todos os outros candidatos dessa federação, para o mesmo cargo e estado.
+
+Os dados dos candidatos ficam em `public/data/candidatos-<UF>.json`, gerados a
+partir dos CSVs oficiais do TSE (ver [Atualizando os dados](#atualizando-os-dados)).
+Não há chamadas ao TSE em tempo de execução — tudo é servido estaticamente pelo
+próprio Next.js.
+
+## Rodando localmente
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Atualizando os dados
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Os dados de candidaturas do TSE são atualizados 4x ao dia até o fim do
+processo eleitoral. Para atualizar:
 
-## Learn More
+1. Baixe o zip de candidatos em
+   <https://dadosabertos.tse.jus.br/dataset/candidatos-2026> (recurso
+   "Candidatos") — atenção: o CDN do TSE bloqueia acessos fora do Brasil.
+2. Extraia os arquivos `consulta_cand_2026_<UF>.csv` para `data/raw/`.
+3. Rode `node scripts/build-data.mjs`, que regenera os arquivos em
+   `public/data/`.
 
-To learn more about Next.js, take a look at the following resources:
+## Deploy
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Projeto pronto para deploy na [Vercel](https://vercel.com/new) — é uma
+aplicação Next.js padrão, sem variáveis de ambiente ou serviços externos.

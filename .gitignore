@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# raw TSE source data (large, re-downloadable; processed JSON in public/data is committed)
+/data/raw/
