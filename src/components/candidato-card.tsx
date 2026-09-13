@@ -48,7 +48,7 @@ export function CandidatoCard({
         }`}
       >
         <span>{candidato.partidoSigla}</span>
-        <span>{candidato.cargo === "federal" ? "Dep. Federal" : "Dep. Estadual"}</span>
+        <span>{candidato.cargo === "federal" ? "Dep./a Federal" : "Dep./a Estadual"}</span>
       </div>
     </div>
   );

@@ -36,7 +36,8 @@ export function FederacaoResult({
       <header className="flex flex-col gap-4 border-b border-line p-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-xs uppercase tracking-widest text-ink-muted">
-            {candidato.cargo === "federal" ? "Deputado Federal" : "Deputado Estadual"} · {candidato.uf}
+            {candidato.cargo === "federal" ? "Deputada/o Federal" : "Deputada/o Estadual"} ·{" "}
+            {candidato.uf}
           </p>
           <h2 className="mt-1 font-heading text-2xl">
             {federacao ? federacao.nome : "Sem federação"}
@@ -48,7 +49,7 @@ export function FederacaoResult({
           </p>
         </div>
         <p className="font-heading text-sm text-ink-muted">
-          {membros.length > 0 ? `${membros.length} candidatos` : ""}
+          {membros.length > 0 ? `${membros.length} candidatas/os` : ""}
         </p>
       </header>
 
@@ -61,7 +62,7 @@ export function FederacaoResult({
           <>
             <div className="mb-4 flex items-center justify-between gap-4">
               <h3 className="font-heading text-sm uppercase tracking-widest text-ink-muted">
-                Demais candidatos da federação em {candidato.uf}
+                Demais candidatas/os da federação em {candidato.uf}
               </h3>
               <input
                 type="text"
@@ -73,7 +74,7 @@ export function FederacaoResult({
             </div>
 
             {filtrados.length === 0 ? (
-              <p className="text-sm text-ink-muted">Nenhum outro candidato encontrado.</p>
+              <p className="text-sm text-ink-muted">Nenhuma outra candidata/o encontrada/o.</p>
             ) : (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {filtrados.map((m) => (

@@ -17,7 +17,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Meu Voto 2026 — para onde vai seu voto",
   description:
-    "Descubra a federação partidária do seu candidato a deputado federal ou estadual em 2026, e todos os outros candidatos dessa federação no seu estado.",
+    "Descubra a federação partidária da sua candidata/o a deputada/o federal ou estadual em 2026, e todas/os as/os outras/os candidatas/os dessa federação no seu estado.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -6,7 +6,7 @@ import { UF_NOMES } from "@/lib/uf-nomes";
 import { CandidatoPicker } from "./candidato-picker";
 import { FederacaoResult } from "./federacao-result";
 
-type ResultadoCargo = {
+type Resultado = {
   candidato: Candidato;
   federacao: {
     nr: number;
@@ -19,27 +19,21 @@ type ResultadoCargo = {
 
 export function VotoForm({ ufs }: { ufs: string[] }) {
   const [uf, setUf] = useState("");
-  const [federal, setFederal] = useState<Candidato | null>(null);
-  const [estadual, setEstadual] = useState<Candidato | null>(null);
+  const [candidato, setCandidato] = useState<Candidato | null>(null);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
-  const [resultados, setResultados] = useState<ResultadoCargo[] | null>(null);
+  const [resultado, setResultado] = useState<Resultado | null>(null);
 
-  const podeConfirmar = uf && (federal || estadual) && !loading;
+  const podeConfirmar = uf && candidato && !loading;
 
   async function handleConfirmar() {
+    if (!candidato) return;
     setLoading(true);
     setErro(null);
     try {
-      const selecionados = [federal, estadual].filter((c): c is Candidato => Boolean(c));
-      const respostas = await Promise.all(
-        selecionados.map(async (c) => {
-          const res = await fetch(`/api/federacao?uf=${uf}&sq=${c.sq}`);
-          if (!res.ok) throw new Error("Falha ao buscar federação");
-          return (await res.json()) as ResultadoCargo;
-        })
-      );
-      setResultados(respostas);
+      const res = await fetch(`/api/federacao?uf=${uf}&sq=${candidato.sq}`);
+      if (!res.ok) throw new Error("Falha ao buscar federação");
+      setResultado((await res.json()) as Resultado);
     } catch {
       setErro("Não foi possível carregar os dados da federação. Tente novamente.");
     } finally {
@@ -50,8 +44,8 @@ export function VotoForm({ ufs }: { ufs: string[] }) {
   return (
     <div className="flex flex-col gap-10">
       <div className="border border-ink bg-card p-6 sm:p-8">
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          <div className="flex flex-col gap-2 sm:col-span-2">
+        <div className="grid grid-cols-1 gap-6">
+          <div className="flex flex-col gap-2">
             <label className="text-xs font-medium uppercase tracking-widest text-ink-muted">
               Estado
             </label>
@@ -59,9 +53,9 @@ export function VotoForm({ ufs }: { ufs: string[] }) {
               value={uf}
               onChange={(e) => {
                 setUf(e.target.value);
-                setResultados(null);
+                setResultado(null);
               }}
-              className="border border-line bg-card px-4 py-3 text-base outline-none focus:border-ink"
+              className="border border-line bg-card px-4 py-3 text-base outline-none focus:border-ink sm:max-w-sm"
             >
               <option value="">Selecione seu estado</option>
               {ufs.map((sigla) => (
@@ -73,28 +67,14 @@ export function VotoForm({ ufs }: { ufs: string[] }) {
           </div>
 
           {uf && (
-            <>
-              <CandidatoPicker
-                uf={uf}
-                cargo="federal"
-                label="Candidato a Deputado Federal"
-                value={federal}
-                onChange={(c) => {
-                  setFederal(c);
-                  setResultados(null);
-                }}
-              />
-              <CandidatoPicker
-                uf={uf}
-                cargo="estadual"
-                label="Candidato a Deputado Estadual"
-                value={estadual}
-                onChange={(c) => {
-                  setEstadual(c);
-                  setResultados(null);
-                }}
-              />
-            </>
+            <CandidatoPicker
+              uf={uf}
+              value={candidato}
+              onChange={(c) => {
+                setCandidato(c);
+                setResultado(null);
+              }}
+            />
           )}
         </div>
 
@@ -110,17 +90,12 @@ export function VotoForm({ ufs }: { ufs: string[] }) {
         {erro && <p className="mt-4 text-sm text-red-700">{erro}</p>}
       </div>
 
-      {resultados && (
-        <div className="flex flex-col gap-8">
-          {resultados.map((r) => (
-            <FederacaoResult
-              key={r.candidato.sq}
-              candidato={r.candidato}
-              federacao={r.federacao}
-              membros={r.membros}
-            />
-          ))}
-        </div>
+      {resultado && (
+        <FederacaoResult
+          candidato={resultado.candidato}
+          federacao={resultado.federacao}
+          membros={resultado.membros}
+        />
       )}
     </div>
   );

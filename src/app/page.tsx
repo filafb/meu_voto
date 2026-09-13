@@ -14,9 +14,9 @@ export default async function Home() {
           Para onde vai o seu voto
         </h1>
         <p className="mt-4 max-w-2xl text-ink-muted">
-          Escolha seu estado e os candidatos a deputado federal e estadual em quem pretende votar.
-          Mostramos a federação partidária de cada um e todos os outros candidatos que integram a
-          mesma federação no seu estado. Dados oficiais do{" "}
+          Escolha seu estado e busque a candidata/o a deputada/o federal ou estadual em quem
+          pretende votar. Mostramos a federação partidária correspondente e todas as demais
+          candidatas/os que integram a mesma federação no seu estado. Dados oficiais do{" "}
           <a
             href="https://dadosabertos.tse.jus.br/dataset/candidatos-2026"
             target="_blank"

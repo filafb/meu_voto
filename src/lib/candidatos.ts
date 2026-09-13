@@ -47,16 +47,19 @@ export async function listUfs(): Promise<string[]> {
   return ufListCache;
 }
 
-export async function searchCandidatos(
-  uf: string,
-  cargo: Cargo,
-  query: string
-): Promise<Candidato[]> {
+export async function searchCandidatos(uf: string, query: string): Promise<Candidato[]> {
   const all = await loadUf(uf);
-  const q = normalize(query);
+  const trimmed = query.trim();
+  if (!trimmed) return [];
+
+  const isNumero = /^\d+$/.test(trimmed);
+  if (isNumero) {
+    return all.filter((c) => c.numero.startsWith(trimmed)).slice(0, 30);
+  }
+
+  const q = normalize(trimmed);
   return all
-    .filter((c) => c.cargo === cargo)
-    .filter((c) => (q ? normalize(c.nomeUrna).includes(q) || normalize(c.nome).includes(q) : true))
+    .filter((c) => normalize(c.nomeUrna).includes(q) || normalize(c.nome).includes(q))
     .slice(0, 30);
 }
 

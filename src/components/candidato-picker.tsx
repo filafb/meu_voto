@@ -1,17 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { Candidato, Cargo } from "@/lib/candidatos";
+import type { Candidato } from "@/lib/candidatos";
+import { CargoTag } from "./cargo-tag";
 
 type Props = {
   uf: string;
-  cargo: Cargo;
-  label: string;
   value: Candidato | null;
   onChange: (candidato: Candidato | null) => void;
 };
 
-export function CandidatoPicker({ uf, cargo, label, value, onChange }: Props) {
+export function CandidatoPicker({ uf, value, onChange }: Props) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Candidato[]>([]);
   const [open, setOpen] = useState(false);
@@ -23,7 +22,7 @@ export function CandidatoPicker({ uf, cargo, label, value, onChange }: Props) {
     setResults([]);
     onChange(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uf, cargo]);
+  }, [uf]);
 
   useEffect(() => {
     if (value) return;
@@ -34,7 +33,7 @@ export function CandidatoPicker({ uf, cargo, label, value, onChange }: Props) {
     const controller = new AbortController();
     setLoading(true);
     const timer = setTimeout(() => {
-      fetch(`/api/candidatos?uf=${uf}&cargo=${cargo}&q=${encodeURIComponent(query)}`, {
+      fetch(`/api/candidatos?uf=${uf}&q=${encodeURIComponent(query)}`, {
         signal: controller.signal,
       })
         .then((r) => r.json())
@@ -46,7 +45,7 @@ export function CandidatoPicker({ uf, cargo, label, value, onChange }: Props) {
       clearTimeout(timer);
       controller.abort();
     };
-  }, [query, uf, cargo, value]);
+  }, [query, uf, value]);
 
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
@@ -61,13 +60,16 @@ export function CandidatoPicker({ uf, cargo, label, value, onChange }: Props) {
   return (
     <div ref={containerRef} className="relative flex flex-col gap-2">
       <label className="text-xs font-medium uppercase tracking-widest text-ink-muted">
-        {label}
+        Candidata/o a deputada/o federal ou estadual
       </label>
 
       {value ? (
         <div className="flex items-center justify-between border border-ink bg-card px-4 py-3">
           <div>
-            <p className="font-heading text-lg leading-none">{value.nomeUrna}</p>
+            <div className="flex items-center gap-2">
+              <p className="font-heading text-lg leading-none">{value.nomeUrna}</p>
+              <CargoTag cargo={value.cargo} />
+            </div>
             <p className="mt-1 text-xs text-ink-muted">
               {value.partidoSigla} · nº {value.numero}
             </p>
@@ -89,7 +91,7 @@ export function CandidatoPicker({ uf, cargo, label, value, onChange }: Props) {
             setQuery(e.target.value);
             setOpen(true);
           }}
-          placeholder="Digite o nome do candidato..."
+          placeholder="Nome ou número da candidata/o..."
           className="border border-line bg-card px-4 py-3 font-body text-base outline-none focus:border-ink"
         />
       )}
@@ -98,7 +100,7 @@ export function CandidatoPicker({ uf, cargo, label, value, onChange }: Props) {
         <div className="absolute top-full z-10 mt-1 max-h-72 w-full overflow-auto border border-ink bg-card shadow-[4px_4px_0_0_var(--ink)]">
           {loading && <p className="px-4 py-3 text-sm text-ink-muted">buscando…</p>}
           {!loading && results.length === 0 && (
-            <p className="px-4 py-3 text-sm text-ink-muted">nenhum candidato encontrado</p>
+            <p className="px-4 py-3 text-sm text-ink-muted">nenhuma candidata/o encontrada/o</p>
           )}
           {results.map((c) => (
             <button
@@ -108,11 +110,14 @@ export function CandidatoPicker({ uf, cargo, label, value, onChange }: Props) {
                 onChange(c);
                 setOpen(false);
               }}
-              className="flex w-full items-center justify-between border-b border-line px-4 py-2.5 text-left last:border-none hover:bg-paper"
+              className="flex w-full items-center justify-between gap-3 border-b border-line px-4 py-2.5 text-left last:border-none hover:bg-paper"
             >
-              <span>
-                <span className="font-medium">{c.nomeUrna}</span>{" "}
-                <span className="text-sm text-ink-muted">({c.nome})</span>
+              <span className="flex min-w-0 items-center gap-2">
+                <CargoTag cargo={c.cargo} />
+                <span className="truncate">
+                  <span className="font-medium">{c.nomeUrna}</span>{" "}
+                  <span className="text-sm text-ink-muted">({c.nome})</span>
+                </span>
               </span>
               <span className="shrink-0 pl-2 text-xs text-ink-muted">
                 {c.partidoSigla} nº{c.numero}
