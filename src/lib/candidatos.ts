@@ -38,6 +38,7 @@ export type DeputadoAtual = {
   partidoNome: string;
   cargo: Cargo;
   uf: string;
+  votos2022: number | null;
 };
 
 const DATA_DIR = join(process.cwd(), "public", "data");
